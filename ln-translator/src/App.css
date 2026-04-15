@@ -1,0 +1,259 @@
+* {
+  margin: 0
+}
+
+:root {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(28, 29, 29);
+  font-family: "Share Tech", sans-serif;
+  width: 100%
+}
+
+menu {
+  background-color: rgb(5, 5, 5);
+  height: 100px;
+  position: fixed;
+  bottom: -20px;
+  left: 0;
+  width: 100%;
+  margin-top: auto;
+}
+
+translate_button {
+  z-index: 100;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+translate_button button {
+  background-color: rgb(72, 89, 106);
+  border-radius: 5px;
+  color: rgb(173, 197, 219);
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: "Share Tech", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+translate_button button:hover {
+  background-color: rgb(39, 55, 70);
+  color: white;
+  border-radius: 15px;
+}
+
+.share-tech-regular {
+  font-family: "Share Tech", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+header {
+  display: flex;
+  flex-direction: row;
+  color: white;
+  background-color: rgb(72, 89, 106);
+  height: auto;
+  width: 100%;
+}
+
+header h1 {
+  margin-left: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+header input {
+  float: right;
+  margin-left: 800px;
+  margin-top: 10px;
+  width: 600px;
+  height: 30px;
+  border-color: rgb(5, 5, 5);
+  border-width: 3px;
+  border-radius: 5px;
+
+}
+
+library {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  margin-bottom: 100px;
+}
+
+novel_button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+  background-color: rgb(0, 0, 0);
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border-radius: 5px;
+}
+
+novel_button a {
+  color: rgb(255, 255, 255);
+  font-size: 18px;
+  text-decoration: none;
+}
+
+chapter Link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+novel_button img {
+  width: 300px;
+  height: 400px;
+  margin-top: 5px;
+}
+
+chapter_button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+  background-color: rgba(75, 81, 81, 0.267);
+  padding: 10px;
+  width: 70px;
+  border-width: 5px;
+  border-color: rgb(75, 81, 81);
+  border-style: solid;
+}
+
+chapter_button:hover {
+  background-color: rgb(75, 81, 81);
+  border-radius: 15px;
+}
+
+chapter_button p {
+  color: rgb(255, 255, 255);  
+}
+
+chapter_button a {
+  color: rgb(75, 81, 81);
+  font-size: 18px;
+  text-decoration: none;
+}
+chapter_button Link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+translate_menu, new_novel_menu {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(28, 29, 29);
+  width: 50%;
+  height: 50%;
+  z-index: 200;
+  color: white;
+  position: fixed;
+  left: 25%;
+  top: 25%;
+  border-radius: 15px;
+  border-width: 15px;
+  border-style: solid;
+  border-color: rgb(75, 81, 81);
+}
+
+translate_menu #exit, new_novel_menu #exit {
+  align-self: flex-end;
+  width: 20px;
+}
+
+translate_menu .row, new_novel_menu .row {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: auto;
+  margin-bottom: 20px;
+}
+
+translate_menu h3, new_novel_menu h3 {
+  margin-right: 20px;
+  justify-content: center;
+}
+
+translate_menu input, new_novel_menu input {
+  margin-left: 20px;
+  width: 300px;
+  height: 30px;
+  border-color: rgb(5, 5, 5);
+  border-width: 3px;
+  border-radius: 5px;
+}
+
+#extra {
+  flex-direction: column;
+  align-items: center
+}
+
+#extra textarea {
+  width: 80%;
+  height: 100px;
+  border-color: rgb(5, 5, 5);
+  border-width: 3px;
+  border-radius: 5px;
+}
+
+translate_menu #submit, new_novel_menu #submit {
+  margin-top: 50px;
+  justify-content: center;
+  align-self: center;
+  height: 50px;
+  background-color: rgb(72, 89, 106);
+  border-radius: 5px;
+  color: rgb(173, 197, 219);
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: "Share Tech", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+translate_menu #submit:hover, new_novel_menu #submit:hover {
+  background-color: rgb(39, 55, 70);
+  color: white;
+  border-radius: 15px;
+}
+
+new_series_button button{
+  margin: 20px;
+  width: 300px;
+  height: 400px;
+  background-color: rgba(0, 0, 0, 0);
+  color: rgb(75, 81, 81);
+  border-color: rgb(75, 81, 81);
+  border-width: 3px;
+  border-radius: 5px;
+}
+
+chapter_page {
+  color: rgb(255, 255, 255);
+  padding: 20px;
+}
+
+chapters {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: left;
+  margin-bottom: 100px;
+}
