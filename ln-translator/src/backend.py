@@ -2,11 +2,15 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 import os
 from huggingface_hub import login
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
+from google.cloud import translate_v2 as gtranslate
+import google.auth.api_key
+from pathlib import Path
+
 
 load_dotenv()
 login(token=os.getenv("HF_TOKEN"))
@@ -42,27 +46,52 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def google_translate(text, api_key, target_language):
+
+    credentials = google.auth.api_key.Credentials(api_key)
+    client = gtranslate.Client(credentials=credentials)
+        
+    response = client.translate(text, target_language=target_language)
+
+    return response["translatedText"]
+
 class chatQuery(BaseModel):
     file: str | None = None
     model: str | None = None
     api_key: str | None = None
-    original_language: str
-    target_language: str
+    target_language: str | None = None
     extra_details: str | None = ""
 
 @app.post("/chat")
-async def translate(query: chatQuery):
-    input_data = query.model_dump()
+async def translate(
+    file: UploadFile = File(...),
+    model: str = Form(...),
+    api_key: str = Form(None),
+    target_language: str = Form(...),
+    extra_details: str = Form("")
+    ):
+    
+    text = await file.read()
+    text = text.decode("utf-8")
+    
+    if model == "google":
+        translated = google_translate(text, api_key, target_language)
+        return {"translation": translated}
 
-    tokenizer, model = initialize_model()#will later need to take api_key
+    tokenizer, model_obj = initialize_model()
 
     messages = [
-        {"role": "user", "content": 
-            "Translate the following " + input_data["original_language"] + " segment into " + input_data["target_language"] + ", without additional explanation.\n\nUse these details: " + str(input_data["extra_details"]) + "\n\nばかやろ"}
+        {
+            "role": "user",
+            "content":
+                f"Translate the following into {target_language}.\n\n"
+                f"Use these details: {extra_details}\n\n{text}"
+        }
     ]
-    output_text = send_message(tokenizer, model, messages)
 
-    return {"translation": output_text}
+    translated = send_message(tokenizer, model_obj, messages)
+
+    return {"translation": translated}
 
 def initialize_model():
     HF_TOKEN = os.getenv("HF_TOKEN")

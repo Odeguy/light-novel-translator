@@ -257,3 +257,37 @@ chapters {
   justify-content: left;
   margin-bottom: 100px;
 }
+
+back_to_series {
+  display: flex;
+  width: 180px;
+  height: 20px;
+  background-color: rgb(72, 89, 106);
+  border-radius: 5px;
+  color: rgb(173, 197, 219);
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: "Share Tech", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  position: fixed;
+  left: 50px;
+  bottom: 20px;
+  z-index: 999;
+}
+
+back_to_series a {
+  text-decoration: none;
+  color: rgb(173, 197, 219);
+}
+
+back_to_series:hover {
+  background-color: rgb(39, 55, 70);
+  border-radius: 15px;
+}
+
+back_to_series:hover a {
+  color: white;
+}
