@@ -247,6 +247,13 @@ new_series_button button{
 chapter_page {
   color: rgb(255, 255, 255);
   padding: 20px;
+  padding-bottom: 900px;
+}
+
+chapter_page p {
+  padding-left: 80px;
+  padding-right: 80px;
+  line-height: 2em;
 }
 
 chapters {
@@ -290,4 +297,37 @@ back_to_series:hover {
 
 back_to_series:hover a {
   color: white;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+#loading {
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+novel_page {
+  display: flex;
+  flex-direction: row;
+}
+
+novel_page .header {
+  margin-top: 20px;
+  font-size: 27px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 50px;
+}
+
+novel_page .header img {
+  width: 70%;
+  margin-top: 20px;
+  border-width: 5px;
+  border-color: rgb(0, 0, 0);
+  border-style: solid;
 }

@@ -1,10 +1,30 @@
 import { use, useState } from 'react'
 import './App.css'
 import { BrowserRouter, Routes, Route, Link, useParams, useLocation, useNavigate } from 'react-router-dom'
+import loadingIcon from './assets/loading.svg'
+
+function loadNovels() {
+
+  let novels = localStorage.getItem("ln-translator-novels")
+  if (novels) {
+    return JSON.parse(novels)
+  } else {
+    return []
+  }
+
+}
+
+function saveNovels(novels) {
+
+  let save = JSON.stringify(novels)
+  localStorage.setItem("ln-translator-novels", save)
+
+}
+
 
 function App() {
   
-  const [novels] = useState([])
+  const [novels, setNovels] = useState(() => loadNovels())
 
   return (
     <BrowserRouter>
@@ -16,7 +36,7 @@ function App() {
       </Link>
 
       <Routes>
-        <Route path="/" element={<Home novels={novels} />} />
+        <Route path="/" element={<Home novels={novels} setNovels={setNovels} />} />
         <Route path="/novel/:index" element={<NovelPage />} />
         <Route path="/novel/:index/chapter/:chapter" element={<ChapterPage />} />
       </Routes>
@@ -28,10 +48,10 @@ function App() {
   )
 }
 
-function Home({ novels }) {
+function Home({ novels, setNovels }) {
   
   const [menu_visible, setMenuVisible] = useState(false)
-  const novel_menu = createNovel(setMenuVisible, novels)
+  const novel_menu = createNovel(setMenuVisible, setNovels, novels)
   const [search_term, setSearchTerm] = useState("")
 
   return (
@@ -63,8 +83,10 @@ function NovelPage() {
 
   return (
     <novel_page>
-      <h1>{novel?.title}</h1>
-      <image src={novel?.thumbnail} alt={novel?.title} />
+      <div class='header'>
+        <h1>{novel?.title}</h1>
+        <img src={novel?.thumbnail} alt={novel?.title} />
+      </div>
       {menu_visible ? translate_menu : null}
       <chapters>
         {chapters.map((chapter, index) => Chapter_Button(chapter, novel, index))}
@@ -144,6 +166,7 @@ function Translate_Menu(hide_func, novel) {
   const [extra_details, setExtraDetails] = useState("")
   const [file, setFile] = useState(null)
   const [fileType, setFileType] = useState("txt")
+  const [loading, setLoading] = useState(false)
   const languages = [
     { label: "Afrikaans", code: "af" },
     { label: "Albanian", code: "sq" },
@@ -276,13 +299,13 @@ function Translate_Menu(hide_func, novel) {
 
   return (
     <translate_menu>
-      <button id='exit'onClick={() => hide_func(false)}>X</button>
+      <button id='exit'onClick={() => {if(!loading) hide_func(false)}}>X</button>
       <div class='row'>
         <h3>File:</h3>
         <select onChange={(e) => setFileType(e.target.value)}>
           <option value="txt">TXT</option>
           <option value="pdf">PDF--doesn't work yet</option>
-          <option value="epub">EPUB</option>
+          <option value="epub">EPUB--doesn't work yet</option>
         </select>
         <input type="file" onChange={(e) => setFile(e.target.files[0])} />
       </div>
@@ -290,10 +313,19 @@ function Translate_Menu(hide_func, novel) {
         <h3>Model:</h3>
         <select value={model} onChange={(e) => setModel(e.target.value)}>
           <option value="google">Google Translate</option>
-          <option value="tencent_hy">Tencent HY</option>
+          <option value="tencent-hy">Tencent HY</option>
         </select>
-        <input type="search" placeholder='API Key...(unecessary for google translate)' onInput={(e) => setApiKey(e.target.value)} />
-        <button onClick={() => open("https://huggingface.co/settings/tokens")}>Get API Key</button>
+        <input type="search" placeholder='API Key' onInput={(e) => setApiKey(e.target.value)} />
+        <button onClick={() => { 
+          switch(model) {
+            case "google":
+              open("https://cloud.google.com/translate/docs/setup")
+              break
+            case "tencent-hy":
+              open("https://huggingface.co/settings/tokens")
+              break
+          }
+        }}>Get API Key</button>
       </div>
       <div class='row'>
         <h3>Languages:</h3>
@@ -306,9 +338,24 @@ function Translate_Menu(hide_func, novel) {
         <textarea placeholder='Things to improve consistency, such as names, pronouns, the premise, etc.' onChange={(e) => setExtraDetails(e.target.value)} />
       </div>
       <button id='submit' onClick={async () => {
-        const result = await Translate(file, model, api_key, target_language, extra_details)
+        if(loading) return;
+        setLoading(true)
+        let result = ""
+        try {
+          result = await Translate(file, model, api_key, target_language, extra_details)
+        } catch (err) {
+          setLoading(false)
+          console.error(err)
+          return
+        }
+        if(result == "Invalid model specified.") {
+          setLoading(false)
+          alert("Invalid model specified.")
+          return
+        }
         novel.chapters.push(result)
-      }}>Submit</button>
+        setLoading(false)
+      }}>{loading ? <img src={loadingIcon} alt="Loading" id="loading"/> : 'Submit'}</button>
 
     </translate_menu>
   )
@@ -322,7 +369,7 @@ function language_option(language) {
   )
 }
 
-function createNovel(hide_func, novels) {
+function createNovel(hide_func, setNovels, novels) {
   
   const [image, setImage] = useState("ln-translator/src/assets/blank.png")
   const [title, setTitle] = useState("")
@@ -339,7 +386,7 @@ function createNovel(hide_func, novels) {
         <input type="file" onChange={(e) => setImage(e.target.files[0])} />
       </div>
       <button id='submit' onClick={() => {
-        novels.push(new Novel(URL.createObjectURL(image), title));
+        setNovels((novels) => [...novels, new Novel(URL.createObjectURL(image), title)]);
         hide_func(false);
       }}>Submit</button>
 
@@ -381,7 +428,6 @@ async function Translate(file, model, api_key, target_language, extra_details) {
   }
 
   const data = await response.json()
-  alert(data.translation)
   return data.translation
 }
 

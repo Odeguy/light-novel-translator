@@ -1,7 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import os
 from huggingface_hub import login
-from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 import asyncio
@@ -9,13 +8,10 @@ from contextlib import asynccontextmanager
 from pydantic import BaseModel
 from google.cloud import translate_v2 as gtranslate
 import google.auth.api_key
-from pathlib import Path
 
 
-load_dotenv()
-login(token=os.getenv("HF_TOKEN"))
+_tencent_model_cache = None
 
-model_name_or_path = "tencent/HY-MT1.5-1.8B"
 
 @asynccontextmanager
 
@@ -74,30 +70,42 @@ async def translate(
     text = await file.read()
     text = text.decode("utf-8")
     
-    if model == "google":
-        translated = google_translate(text, api_key, target_language)
-        return {"translation": translated}
+    match model:
 
-    tokenizer, model_obj = initialize_model()
+        case "google":
+            translated = google_translate(text, api_key, target_language)
+            return {"translation": translated}
+        
+        case "tencent-hy":
+            tokenizer, model_obj = initialize_model(api_key)
 
-    messages = [
-        {
-            "role": "user",
-            "content":
-                f"Translate the following into {target_language}.\n\n"
-                f"Use these details: {extra_details}\n\n{text}"
-        }
-    ]
+            messages = [
+                {
+                    "role": "user",
+                    "content":
+                        f"Translate the following into {target_language}.\n\n"
+                        f"Use these details: {extra_details}\n\n{text}"
+                }
+            ]
 
-    translated = send_message(tokenizer, model_obj, messages)
+            translated = await asyncio.to_thread(send_message, tokenizer, model_obj, messages)
 
-    return {"translation": translated}
+            return {"translation": translated}
+    
+    return {"translation": "Invalid model specified."}
 
-def initialize_model():
-    HF_TOKEN = os.getenv("HF_TOKEN")
+def initialize_model(api_key):
+    global _tencent_model_cache
+    if _tencent_model_cache is not None:
+        return _tencent_model_cache
+
+    HF_TOKEN = api_key
+    model_name_or_path = "tencent/HY-MT1.5-1.8B"
+    login(HF_TOKEN)
     tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
     model = AutoModelForCausalLM.from_pretrained(model_name_or_path, device_map="auto")  # You may want to use bfloat16 and/or move to GPU here
-    return tokenizer, model
+    _tencent_model_cache = (tokenizer, model)
+    return _tencent_model_cache
 
 def send_message(tokenizer, model, messages):
     tokenized_chat = tokenizer.apply_chat_template(
