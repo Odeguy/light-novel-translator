@@ -359,3 +359,55 @@ delete_button button:hover {
   color: white;
   border-radius: 15px;
 }
+
+chapter_delete_mode_button {
+  z-index: 100;
+  position: fixed;
+  bottom: 20px;
+  left: 180px;
+}
+
+chapter_delete_mode_button button {
+  background-color: rgb(99, 99, 99);
+  border-radius: 5px;
+  color: rgb(156, 8, 173);
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: "Share Tech", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+chapter_delete_mode_button button:hover {
+  background-color: rgb(30, 5, 72);
+  color: white;
+  border-radius: 15px;
+}
+
+delete_chapter_button button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+  background-color: rgba(43, 2, 2, 0.267);
+  padding: 10px;
+  width: 100px;
+  height: min-content;
+  border-width: 5px;
+  border-color: rgb(235, 54, 54);
+  border-style: solid;
+  font-family: "Share Tech", sans-serif;
+  font-size: 16px;
+  font-style: bold;
+}
+
+delete_chapter_button button:hover {
+  background-color: rgb(21, 4, 4);
+  border-radius: 15px;
+}
+
+delete_chapter_button button p {
+  color: rgb(255, 255, 255);  
+}

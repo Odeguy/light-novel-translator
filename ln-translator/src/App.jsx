@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
-import { BrowserRouter, Routes, Route, Link, useParams, useLocation, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link, useParams, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import loadingIcon from './assets/loading.svg'
 import blankImage from './assets/blank.png'
 
@@ -89,11 +89,13 @@ function Home({ novels, setNovels }) {
 function NovelPage({ novels, setNovels }) {
 
   const [menu_visible, setMenuVisible] = useState(false)
-  const { id } = useParams()
+  const navigate = useNavigate()
+  const { index } = useParams()
   const location = useLocation()
-  const novel = location.state.novel
-  const chapters = novel?.chapters
-  const translate_menu = Translate_Menu(setMenuVisible, novel)
+  const novel = novels.find((enovel) => enovel.id == index)
+  const chapters = novel?.chapters || []
+  const translate_menu = Translate_Menu(setMenuVisible, novel, setNovels)
+  const [deleting, setDeleting] = useState(false)
 
   return (
     <novel_page>
@@ -103,7 +105,7 @@ function NovelPage({ novels, setNovels }) {
       </div>
       {menu_visible ? translate_menu : null}
       <chapters>
-        {chapters.map((chapter, index) => Chapter_Button(chapter, novel, index))}
+        {!deleting ? chapters.map((chapter, index) => Chapter_Button(chapter, novel, index)) : chapters.map((chapter, index) => Delete_Chapter_Button(chapter, novel, index, setNovels))}
       </chapters>
 
       <translate_button>
@@ -115,11 +117,17 @@ function NovelPage({ novels, setNovels }) {
         <button onClick={() => {
           if (window.confirm("Are you sure you want to delete this novel? This action cannot be undone.")) {
             setNovels(novels.filter((enovel) => enovel.id != novel.id))
+            navigate('/')
           }
         }}>
           <p>Delete Series</p>
         </button>
       </delete_button>
+      <chapter_delete_mode_button>
+        <button onClick={() => setDeleting(!deleting)}>
+          <p>{!deleting ? "Delete Chapters" : "Exit Chapter Delete Mode"}</p>
+        </button>
+      </chapter_delete_mode_button>
     </novel_page>
   )
 }
@@ -142,7 +150,7 @@ class Novel{
 function Novel_Button(Novel) {
   return (
     <novel_button>
-      <Link to={`/novel/${Novel.id}`} state={{ novel: Novel }}>
+      <Link to={`/novel/${Novel.id}`}>
         <img src={Novel.thumbnail} alt={Novel.title} />
         <p>{Novel.title}</p>
       </Link>
@@ -157,6 +165,29 @@ function Chapter_Button(chapter, novel, index) {
         <p>{index + 1}</p>
       </chapter_button>
     </Link>
+  )
+}
+
+
+function Delete_Chapter_Button(chapter, novel, index, setNovels) {
+  return (
+    <delete_chapter_button>
+      <button onClick={() => {
+        setNovels((novels) => {
+          return novels.map((enovel) => {
+            if (enovel.id == novel.id) {
+              return {
+                ...enovel,
+                chapters: enovel.chapters.filter((_, eindex) => eindex != index)
+              } 
+            }
+            return enovel
+          })
+        })
+      }}>
+        <p>{index + 1}</p>
+      </button>
+    </delete_chapter_button>
   )
 }
 
@@ -181,7 +212,7 @@ function ChapterPage() {
 
 }
 
-function Translate_Menu(hide_func, novel) {
+function Translate_Menu(hide_func, novel, setNovels) {
 
   const [model, setModel] = useState("google")
   const [api_key, setApiKey] = useState("")
@@ -376,7 +407,17 @@ function Translate_Menu(hide_func, novel) {
           alert("Invalid model specified.")
           return
         }
-        novel.chapters.push(result)
+        setNovels((novels) => {
+          return novels.map((enovel) => {
+            if (enovel.id == novel.id) {
+              return {
+                ...enovel,
+                chapters: [...enovel.chapters, result]
+              }
+            }
+            return enovel
+          })
+        })
         setLoading(false)
       }}>{loading ? <img src={loadingIcon} alt="Loading" id="loading"/> : 'Submit'}</button>
 
