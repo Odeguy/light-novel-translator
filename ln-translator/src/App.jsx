@@ -1,7 +1,8 @@
-import { use, useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { BrowserRouter, Routes, Route, Link, useParams, useLocation, useNavigate } from 'react-router-dom'
 import loadingIcon from './assets/loading.svg'
+import blankImage from './assets/blank.png'
 
 function loadNovels() {
 
@@ -21,23 +22,36 @@ function saveNovels(novels) {
 
 }
 
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+}
+
 
 function App() {
   
   const [novels, setNovels] = useState(() => loadNovels())
 
+  useEffect(() => {
+    saveNovels(novels)
+  }, [novels])
+
   return (
     <BrowserRouter>
-      <title>Light Novel Translator</title>
+      <title>Web Novel Translator</title>
       <Link to="/" style={{ textDecoration: 'none' }}>
         <header>
-          <h1>Light Novel Translator</h1>
+          <h1>Web Novel Translator</h1>
         </header>
       </Link>
 
       <Routes>
         <Route path="/" element={<Home novels={novels} setNovels={setNovels} />} />
-        <Route path="/novel/:index" element={<NovelPage />} />
+        <Route path="/novel/:index" element={<NovelPage novels={novels} setNovels={setNovels} />} />
         <Route path="/novel/:index/chapter/:chapter" element={<ChapterPage />} />
       </Routes>
 
@@ -72,7 +86,7 @@ function Home({ novels, setNovels }) {
   )
 }
 
-function NovelPage() {
+function NovelPage({ novels, setNovels }) {
 
   const [menu_visible, setMenuVisible] = useState(false)
   const { id } = useParams()
@@ -97,6 +111,15 @@ function NovelPage() {
           <p>Translate New Chapters</p>
         </button>
       </translate_button>
+      <delete_button>
+        <button onClick={() => {
+          if (window.confirm("Are you sure you want to delete this novel? This action cannot be undone.")) {
+            setNovels(novels.filter((enovel) => enovel.id != novel.id))
+          }
+        }}>
+          <p>Delete Series</p>
+        </button>
+      </delete_button>
     </novel_page>
   )
 }
@@ -129,7 +152,7 @@ function Novel_Button(Novel) {
 
 function Chapter_Button(chapter, novel, index) {
   return (
-    <Link to={`/novel/${novel.id}/chapter/${index + 1}`} state={{ chapter: chapter, novel : novel }}>
+    <Link to={`/novel/${novel.id}/chapter/${index + 1}`} state={{ chapter: chapter, novel : novel }} id="devil">
       <chapter_button>
         <p>{index + 1}</p>
       </chapter_button>
@@ -371,7 +394,7 @@ function language_option(language) {
 
 function createNovel(hide_func, setNovels, novels) {
   
-  const [image, setImage] = useState("ln-translator/src/assets/blank.png")
+  const [image, setImage] = useState(blankImage)
   const [title, setTitle] = useState("")
 
   return (
@@ -385,8 +408,9 @@ function createNovel(hide_func, setNovels, novels) {
         <h3>Thumbnail:</h3>
         <input type="file" onChange={(e) => setImage(e.target.files[0])} />
       </div>
-      <button id='submit' onClick={() => {
-        setNovels((novels) => [...novels, new Novel(URL.createObjectURL(image), title)]);
+      <button id='submit' onClick={async () => {
+        const thumbnail = image instanceof File ? await fileToDataUrl(image) : image
+        setNovels((novels) => [...novels, new Novel(thumbnail, title)]);
         hide_func(false);
       }}>Submit</button>
 

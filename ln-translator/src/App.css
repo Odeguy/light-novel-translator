@@ -147,10 +147,12 @@ chapter_button a {
   font-size: 18px;
   text-decoration: none;
 }
-chapter_button Link {
+#devil {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width:min-content;
+  height:min-content;
 }
 
 translate_menu, new_novel_menu {
@@ -330,4 +332,30 @@ novel_page .header img {
   border-width: 5px;
   border-color: rgb(0, 0, 0);
   border-style: solid;
+}
+
+delete_button {
+  z-index: 100;
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+}
+
+delete_button button {
+  background-color: rgb(171, 36, 36);
+  border-radius: 5px;
+  color: rgb(59, 12, 12);
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: "Share Tech", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+delete_button button:hover {
+  background-color: rgb(107, 26, 26);
+  color: white;
+  border-radius: 15px;
 }
