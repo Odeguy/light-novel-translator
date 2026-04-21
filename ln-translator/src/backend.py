@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 from pydantic import BaseModel
 from google.cloud import translate_v2 as gtranslate
 import google.auth.api_key
+import deepl
 
 
 _tencent_model_cache = None
@@ -69,16 +70,14 @@ async def translate(
     
     text = await file.read()
     text = text.decode("utf-8")
+    translated = "Invalid model specified"
     
     match model:
-
         case "google":
             translated = google_translate(text, api_key, target_language)
-            return {"translation": translated}
-        
+            return {"translation": translated} 
         case "tencent-hy":
             tokenizer, model_obj = initialize_model(api_key)
-
             messages = [
                 {
                     "role": "user",
@@ -87,12 +86,13 @@ async def translate(
                         f"Use these details: {extra_details}\n\n{text}"
                 }
             ]
-
             translated = await asyncio.to_thread(send_message, tokenizer, model_obj, messages)
-
-            return {"translation": translated}
+        case "deepL":
+            deepl_client = deepl.DeepLClient(api_key)
+            result = deepl_client.translate_text(text, target_lang=target_language)
+            translated = result.text
     
-    return {"translation": "Invalid model specified."}
+    return {"translation": translated}
 
 def initialize_model(api_key):
     global _tencent_model_cache

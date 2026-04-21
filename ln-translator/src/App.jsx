@@ -3,6 +3,8 @@ import './App.css'
 import { BrowserRouter, Routes, Route, Link, useParams, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import loadingIcon from './assets/loading.svg'
 import blankImage from './assets/blank.png'
+import rightArrow from './assets/arrow_right.svg'
+import leftArrow from './assets/arrow_left.svg'
 
 function loadNovels() {
 
@@ -51,8 +53,8 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home novels={novels} setNovels={setNovels} />} />
-        <Route path="/novel/:index" element={<NovelPage novels={novels} setNovels={setNovels} />} />
-        <Route path="/novel/:index/chapter/:chapter" element={<ChapterPage />} />
+        <Route path="/novel/:id" element={<NovelPage novels={novels} setNovels={setNovels} />} />
+        <Route path="/novel/:id/chapter/:chapter" element={<ChapterPage novels={novels}/>} />
       </Routes>
 
       <menu>
@@ -90,9 +92,9 @@ function NovelPage({ novels, setNovels }) {
 
   const [menu_visible, setMenuVisible] = useState(false)
   const navigate = useNavigate()
-  const { index } = useParams()
+  const { id } = useParams()
   const location = useLocation()
-  const novel = novels.find((enovel) => enovel.id == index)
+  const novel = novels.find((enovel) => enovel.id == id)
   const chapters = novel?.chapters || []
   const translate_menu = Translate_Menu(setMenuVisible, novel, setNovels)
   const [deleting, setDeleting] = useState(false)
@@ -142,7 +144,7 @@ class Novel{
     this.thumbnail = thumbnail
     this.title = title
     this.id = Math.random().toString(36).substring(2, 9)
-    this.chapters = ["Chapter 1: Everyone Dies", "Chapter 2: Everyone's Back!"]
+    this.chapters = ["Chapter 1: Everyone Dies", "Chapter 2: \nEveryone's Back!"]
   }
 
 }
@@ -160,7 +162,7 @@ function Novel_Button(Novel) {
 
 function Chapter_Button(chapter, novel, index) {
   return (
-    <Link to={`/novel/${novel.id}/chapter/${index + 1}`} state={{ chapter: chapter, novel : novel }} id="devil">
+    <Link to={`/novel/${novel.id}/chapter/${index + 1}`} id="devil">
       <chapter_button>
         <p>{index + 1}</p>
       </chapter_button>
@@ -191,11 +193,14 @@ function Delete_Chapter_Button(chapter, novel, index, setNovels) {
   )
 }
 
-function ChapterPage() {
+function ChapterPage({ novels }) {
 
-  const location = useLocation()
-  const text = location.state.chapter
-  const novel = location.state.novel
+  const params = useParams()
+  const id = params.id
+  const index = parseInt(params.chapter)
+  
+  const novel = novels.find((n) => n.id == id)
+  const text = novel.chapters[index - 1]
 
   return (
     <chapter_page>
@@ -207,6 +212,22 @@ function ChapterPage() {
           Back to Series Page
         </back_to_series>
       </Link>
+      
+      {(index < novels.length + 1) ?
+        <Link to={`/novel/${novel.id}/chapter/${index + 1}`} id="devil">
+          <next_chapter_button>
+            <img src={rightArrow} class="arrow"/>
+          </next_chapter_button>
+        </Link>
+      : null}
+      {(index > 1) ?
+        <Link to={`/novel/${novel.id}/chapter/${index - 1}`} id="devil">
+          <prev_chapter_button>
+            <img src={leftArrow} class="arrow"/>
+          </prev_chapter_button>
+        </Link>
+      : null}
+
     </chapter_page>
   )
 
@@ -214,7 +235,7 @@ function ChapterPage() {
 
 function Translate_Menu(hide_func, novel, setNovels) {
 
-  const [model, setModel] = useState("google")
+  const [model, setModel] = useState("deepL")
   const [api_key, setApiKey] = useState("")
   const [target_language, setTargetLanguage] = useState("en-US")
   const [extra_details, setExtraDetails] = useState("")
@@ -366,6 +387,7 @@ function Translate_Menu(hide_func, novel, setNovels) {
       <div class='row'>
         <h3>Model:</h3>
         <select value={model} onChange={(e) => setModel(e.target.value)}>
+          <option value="deepL">DeepL</option>
           <option value="google">Google Translate</option>
           <option value="tencent-hy">Tencent HY</option>
         </select>
@@ -377,6 +399,9 @@ function Translate_Menu(hide_func, novel, setNovels) {
               break
             case "tencent-hy":
               open("https://huggingface.co/settings/tokens")
+              break
+            case "deepL":
+              open("https://www.deepl.com/pro-api")
               break
           }
         }}>Get API Key</button>

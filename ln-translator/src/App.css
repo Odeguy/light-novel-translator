@@ -256,6 +256,7 @@ chapter_page p {
   padding-left: 80px;
   padding-right: 80px;
   line-height: 2em;
+  white-space: pre-line;
 }
 
 chapters {
@@ -410,4 +411,64 @@ delete_chapter_button button:hover {
 
 delete_chapter_button button p {
   color: rgb(255, 255, 255);  
+}
+
+prev_chapter_button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  right: 140px;
+  bottom: 10px;
+  z-index: 100;
+  background-color: rgba(75, 81, 81, 0.267);
+  padding: 10px;
+  width: 70px;
+  height: min-content;
+  border-width: 5px;
+  border-color: rgb(75, 81, 81);
+  border-radius: 5px;
+  border-style: solid;
+  color: white;
+}
+
+prev_chapter_button a {
+  text-decoration: none;
+}
+
+prev_chapter_button:hover {
+  background-color: rgb(75, 81, 81);
+  border-radius: 15px;
+}
+
+next_chapter_button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: fixed;
+  right: 20px;
+  bottom: 10px;
+  z-index: 100;
+  background-color: rgba(75, 81, 81, 0.267);
+  padding: 10px;
+  width: 70px;
+  height: min-content;
+  border-width: 5px;
+  border-color: rgb(75, 81, 81);
+  border-radius: 5px;
+  border-style: solid;
+  color: white;
+}
+
+next_chapter_button a {
+  text-decoration: none;
+}
+
+next_chapter_button:hover {
+  background-color: rgb(75, 81, 81);
+  border-radius: 15px;
+}
+
+.arrow {
+  height: 30px;
 }
