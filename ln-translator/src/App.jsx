@@ -508,6 +508,11 @@ async function Translate(file, model, api_key, target_language, extra_details) {
   formData.append("extra_details", extra_details || "")
   
   const FAST_API_URL = process.env.FAST_API_URL || "http://localhost:8000";
+  if (prrocess.env.FAST_API_URL) {
+    console.log("Using FAST_API_URL from environment:", FAST_API_URL);
+  } else {
+    console.warn("FAST_API_URL is not set in environment variables. Using default:", FAST_API_URL);
+  }
   const response = await fetch(FAST_API_URL, {
     method: "POST",
     body: formData
