@@ -5,7 +5,7 @@ import loadingIcon from './assets/loading.svg'
 import blankImage from './assets/blank.png'
 import rightArrow from './assets/arrow_right.svg'
 import leftArrow from './assets/arrow_left.svg'
-const API_URL = process.env.FAST_API_URL ? process.env.FAST_API_URL : "http://localhost:8000"
+const FAST_API_URL = process.env.FAST_API_URL
 
 
 function loadNovels() {
@@ -508,7 +508,7 @@ async function Translate(file, model, api_key, target_language, extra_details) {
   formData.append("target_language", target_language)
   formData.append("extra_details", extra_details || "")
   
-  const response = await fetch("FAST_API_URL", {
+  const response = await fetch(FAST_API_URL, {
     method: "POST",
     body: formData
   })
