@@ -5,7 +5,7 @@ import loadingIcon from './assets/loading.svg'
 import blankImage from './assets/blank.png'
 import rightArrow from './assets/arrow_right.svg'
 import leftArrow from './assets/arrow_left.svg'
-const VITE_BACKEND_URL = process.env.VITE_BACKEND_URL || "http://localhost:8000";
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
 
 
 function loadNovels() {
