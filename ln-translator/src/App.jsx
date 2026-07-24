@@ -508,11 +508,6 @@ async function Translate(file, model, api_key, target_language, extra_details) {
   formData.append("target_language", target_language)
   formData.append("extra_details", extra_details || "")
   
-  if (process.env.VITE_BACKEND_URL) {
-    console.log("Using VITE_BACKEND_URL from environment:", VITE_BACKEND_URL);
-  } else {
-    console.warn("VITE_BACKEND_URL is not set in environment variables. Using default:", VITE_BACKEND_URL);
-  }
   const response = await fetch(VITE_BACKEND_URL, {
     method: "POST",
     body: formData
