@@ -146,7 +146,7 @@ class Novel{
     this.thumbnail = thumbnail
     this.title = title
     this.id = Math.random().toString(36).substring(2, 9)
-    this.chapters = ["Chapter 1: Everyone Dies", "Chapter 2: \nEveryone's Back!"]
+    this.chapters = []
   }
 
 }
