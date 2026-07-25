@@ -508,7 +508,7 @@ async function Translate(file, model, api_key, target_language, extra_details) {
   formData.append("target_language", target_language)
   formData.append("extra_details", extra_details || "")
   
-  const response = await fetch(VITE_BACKEND_URL, {
+  const response = await fetch(VITE_BACKEND_URL + "/chat", {
     method: "POST",
     body: formData
   })
